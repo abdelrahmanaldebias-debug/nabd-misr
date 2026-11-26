@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نبض مصر — نشرة إخبارية موثقة</title>
+  <style>
+    body { font-family: Tahoma, Arial, sans-serif; background: #f4f6fa; color: #1c2430; margin: 0; padding: 0 0 40px; direction: rtl; }
+    header { background: linear-gradient(135deg, #0f4c81, #1d63b8); color: #fff; padding: 18px 16px; text-align: center; }
+    header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+    .owner { background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.9rem; margin-top: 6px; }
+    .container { max-width: 820px; margin: 16px auto; padding: 0 14px; }
+    .rules { background: #fff3cd; border-right: 5px solid #ffc107; padding: 12px; border-radius: 8px; margin-bottom: 12px; color: #4d3b00; font-size: 0.9rem; }
+    .alert { background: #fdeaea; border-right: 5px solid #dc3545; padding: 12px; border-radius: 8px; margin-bottom: 14px; color: #842029; font-size: 0.88rem; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-btn { flex: 1 1 70px; padding: 10px; border: 1px solid #1d63b8; background: #fff; color: #1d63b8; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .filter-btn.active { background: #1d63b8; color: #fff; }
+    .card { background: #fff; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #e3e8ef; }
+    .tag { background: #e7f1ff; color: #0f4c81; padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 0.82rem; }
+    .card h2 { font-size: 1.05rem; margin: 8px 0 6px; }
+    .card p { font-size: 0.94rem; margin: 0 0 8px; }
+    .src { font-size: 0.82rem; color: #5a6577; border-top: 1px dashed #e2e8f0; padding-top: 6px; }
+    footer { text-align: center; margin-top: 24px; font-size: 0.85rem; color: #5a6577; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>نبض مصر</h1>
+    <div>تغطية مدققة لحظة بلحظة: العالم • مصر • القليوبية • شبين القناطر</div>
+    <div class="owner">إعداد وحقوق الملكية: م/ عبد الرحمن الدبيس</div>
+  </header>
+
+  <div class="container">
+    <div class="rules">
+      <strong>قواعد النشر الصارمة:</strong> اعتماد المصادر الرسمية والموثوقة • عدم التأليف أو التخمين أو الهلوسة أو التهويل • تدقيق إلزامي قبل النشر.
+    </div>
+    <div class="alert">
+      <strong>تنبيه التحقق:</strong> يُرجى التحقق المباشر من المصادر الرسمية المعتمدة لمتابعة التطورات والبيانات المتغيرة أولاً بأول.
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterNews('الكل', this)">الكل</button>
+      <button class="filter-btn" onclick="filterNews('العالم', this)">العالم</button>
+      <button class="filter-btn" onclick="filterNews('مصر', this)">مصر</button>
+      <button class="filter-btn" onclick="filterNews('القليوبية', this)">القليوبية</button>
+      <button class="filter-btn" onclick="filterNews('شبين القناطر', this)">شبين القناطر</button>
+    </div>
+
+    <div id="news-list"></div>
+  </div>
+
+  <footer>حقوق الملكية محفوظة © م/ عبد الرحمن الدبيس — برنامج «نبض مصر»</footer>
+
+  <script>
+    const newsItems = [
+      { region: "مصر", title: "تحركات دبلوماسية واستعراض جهود وقف إطلاق النار في غزة", summary: "استقبال رسمي بقصر الاتحادية وتأكيد على تعزيز الشراكة الاقتصادية واستعراض الجهود المصرية لتنفيذ اتفاق وقف إطلاق النار في غزة.", source: "البيانات والتغطيات الرسمية المعتمدة (يتطلب التحقق المباشر)" },
+      { region: "مصر", title: "متابعات حكومية وقضائية وتأمينية عقب حادث حريق دائري الوراق", summary: "تحركات رسمية لدعم أسر الضحايا والمصابين وإعلان حصيلة أولية من وزارة الصحة وضبط المتهم وفق بيان النيابة العامة.", source: "مجلس الوزراء، الصحة، التضامن، النيابة العامة (يتطلب التحقق المباشر)" },
+      { region: "القليوبية", title: "متابعة الملفات الخدمية وتطورات ملف مركب قبالة ليبيا", summary: "متابعة المرافق والخدمات بالمحافظة، ومتابعة وزارة الخارجية والقنصلية في بنغازي أوضاع ركاب المركب قبالة ليبيا.", source: "محافظة القليوبية ووزارة الخارجية المصرية (يتطلب التحقق المباشر)" },
+      { region: "شبين القناطر", title: "توجيه بدراسة توسعة نفق محطة القطار ومتابعة المستشفى والمزلقان", summary: "توجيه بإعداد دراسة هندسية لتوسعة نفق محطة قطار شبين القناطر ومتابعة نسب تنفيذ المستشفى المركزي والتحويلات المرورية بمزلقان كفر شبين.", source: "محافظة القليوبية والجهات التنفيذية المختصة (يتطلب التحقق المباشر)" },
+      { region: "العالم", title: "عقوبات أمريكية جديدة وتضامن إقليمي ومتابعة رياضية", summary: "عقوبات أمريكية جديدة على كيانات مصرفية مرتبطة بإيران، وتضامن عربي مع مصر عقب حادث الوراق، ومتابعة جولة الفورمولا-1 بقطر.", source: "وكالات الأنباء والبيانات الرسمية الدولية (يتطلب التحقق المباشر)" }
+    ];
+
+    function renderNews(items) {
+      document.getElementById("news-list").innerHTML = items.map(item => `
+        <div class="card">
+          <span class="tag">${item.region}</span>
+          <h2>${item.title}</h2>
+          <p>${item.summary}</p>
+          <div class="src">المصدر: ${item.source}</div>
+        </div>
+      `).join("");
+    }
+
+    function filterNews(region, btn) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderNews(region === "الكل" ? newsItems : newsItems.filter(i => i.region === region));
+    }
+
+    renderNews(newsItems);
+  </script>
+</body>
+</html>
