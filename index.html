@@ -46,22 +46,21 @@
       <button class="filter-btn" onclick="filterNews('شبين القناطر', this)">شبين القناطر</button>
     </div>
 
-    <div id="news-list"></div>
+    <div id="news-list"><div class="card">جاري تحميل الأخبار الموثقة...</div></div>
   </div>
 
   <footer>حقوق الملكية محفوظة © م/ عبد الرحمن الدبيس — برنامج «نبض مصر»</footer>
 
   <script>
-    const newsItems = [
-      { region: "مصر", title: "تحركات دبلوماسية واستعراض جهود وقف إطلاق النار في غزة", summary: "استقبال رسمي بقصر الاتحادية وتأكيد على تعزيز الشراكة الاقتصادية واستعراض الجهود المصرية لتنفيذ اتفاق وقف إطلاق النار في غزة.", source: "البيانات والتغطيات الرسمية المعتمدة (يتطلب التحقق المباشر)" },
-      { region: "مصر", title: "متابعات حكومية وقضائية وتأمينية عقب حادث حريق دائري الوراق", summary: "تحركات رسمية لدعم أسر الضحايا والمصابين وإعلان حصيلة أولية من وزارة الصحة وضبط المتهم وفق بيان النيابة العامة.", source: "مجلس الوزراء، الصحة، التضامن، النيابة العامة (يتطلب التحقق المباشر)" },
-      { region: "القليوبية", title: "متابعة الملفات الخدمية وتطورات ملف مركب قبالة ليبيا", summary: "متابعة المرافق والخدمات بالمحافظة، ومتابعة وزارة الخارجية والقنصلية في بنغازي أوضاع ركاب المركب قبالة ليبيا.", source: "محافظة القليوبية ووزارة الخارجية المصرية (يتطلب التحقق المباشر)" },
-      { region: "شبين القناطر", title: "توجيه بدراسة توسعة نفق محطة القطار ومتابعة المستشفى والمزلقان", summary: "توجيه بإعداد دراسة هندسية لتوسعة نفق محطة قطار شبين القناطر ومتابعة نسب تنفيذ المستشفى المركزي والتحويلات المرورية بمزلقان كفر شبين.", source: "محافظة القليوبية والجهات التنفيذية المختصة (يتطلب التحقق المباشر)" },
-      { region: "العالم", title: "عقوبات أمريكية جديدة وتضامن إقليمي ومتابعة رياضية", summary: "عقوبات أمريكية جديدة على كيانات مصرفية مرتبطة بإيران، وتضامن عربي مع مصر عقب حادث الوراق، ومتابعة جولة الفورمولا-1 بقطر.", source: "وكالات الأنباء والبيانات الرسمية الدولية (يتطلب التحقق المباشر)" }
-    ];
+    let newsItems = [];
 
     function renderNews(items) {
-      document.getElementById("news-list").innerHTML = items.map(item => `
+      const list = document.getElementById("news-list");
+      if (!items.length) {
+        list.innerHTML = '<div class="card">لا توجد أخبار منشورة في هذا القسم حالياً.</div>';
+        return;
+      }
+      list.innerHTML = items.map(item => `
         <div class="card">
           <span class="tag">${item.region}</span>
           <h2>${item.title}</h2>
@@ -77,7 +76,19 @@
       renderNews(region === "الكل" ? newsItems : newsItems.filter(i => i.region === region));
     }
 
-    renderNews(newsItems);
+    async function loadNews() {
+      try {
+        const response = await fetch("news.json?v=" + Date.now());
+        if (!response.ok) throw new Error("فشل تحميل ملف الأخبار");
+        newsItems = await response.json();
+        renderNews(newsItems);
+      } catch (err) {
+        document.getElementById("news-list").innerHTML =
+          '<div class="card">تعذر تحميل ملف الأخبار حالياً. تأكد من وجود ملف news.json في نفس المجلد.</div>';
+      }
+    }
+
+    loadNews();
   </script>
 </body>
 </html>
