@@ -1,0 +1,33 @@
+name: التحديث التلقائي للأخبار - نبض مصر
+
+on:
+  schedule:
+    # يعمل تلقائياً كل 3 ساعات
+    - cron: '0 */3 * * *'
+  # يتيح لك تشغيله يدوياً بضغطة زر في أي وقت للتجربة
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: سحب ملفات المستودع
+        uses: actions/checkout@v4
+
+      - name: تجهيز بايثون
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: تشغيل سكريبت جلب الأخبار
+        run: python fetch_news.py
+
+      - name: حفظ الأخبار الجديدة في news.json
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "نبض مصر - التحديث الآلي"
+          git add news.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "تحديث تلقائي للأخبار" && git push)
